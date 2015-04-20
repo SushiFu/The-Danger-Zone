@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Opt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Fullscreen>true</Fullscreen>
+  <SoundOn>false</SoundOn>
+  <name>Quentin</name>
+  <controleTab>
+    <Keys>Z</Keys>
+    <Keys>Q</Keys>
+    <Keys>D</Keys>
+    <Keys>S</Keys>
+    <Keys>R</Keys>
+    <Keys>X</Keys>
+    <Keys>E</Keys>
+    <Keys>A</Keys>
+  </controleTab>
+  <masterServerAdress>localhost</masterServerAdress>
+  <language>Francais</language>
+</Opt>

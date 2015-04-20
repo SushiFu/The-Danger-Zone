@@ -1,0 +1,195 @@
+#region Using Statements
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Storage;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+#endregion Using Statements
+
+namespace ProjetSup_Win_SLMQ
+{
+    public partial class GameMain : Game
+    {
+        private KeyboardState keyboardState;
+        private KeyboardState oldKeyboardState;
+        private MouseState mouseState;
+        private MouseState oldMouseState;
+        private ObjetDyna[] obj;
+        private String msg;
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (menu.optionsMenu.toFullScreen)
+            {
+                graphics.PreferredBackBufferHeight = 1000;
+                graphics.PreferredBackBufferWidth = GraphicsDevice.Viewport.Width;
+                Window.AllowUserResizing = false;
+                Window.IsBorderless = true;
+                graphics.ApplyChanges();
+                menu.optionsMenu.toFullScreen = false;
+            }
+            if (menu.optionsMenu.toWindowed)
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    graphics.PreferredBackBufferHeight = GraphicsDevice.Viewport.Height - 1;
+                    graphics.PreferredBackBufferWidth = GraphicsDevice.Viewport.Width;
+                    Window.AllowUserResizing = false;
+                    Window.IsBorderless = false;
+                    graphics.ApplyChanges();
+                    menu.optionsMenu.toWindowed = false;
+                }
+            }
+
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || (Keyboard.GetState().IsKeyDown(Keys.Escape) && menu.menuState != MenuState.main))
+            {
+                gameState = GameState.menu;
+                menu.menuState = MenuState.main;
+                menu = new Menu(Content, GraphicsDevice, sound);
+            }
+
+            //Events States Mouse and Keyboard
+            keyboardState = Keyboard.GetState();
+            mouseState = Mouse.GetState();
+
+            UpdateMouse();
+            msg = "";
+
+            switch (gameState)
+            {
+                case GameState.solo:
+                    destrucTileList = new List<Vector3>();
+                    CreateDyna();
+                    Player1Events.CheckEvents(keyboardState, oldKeyboardState, players[hostPlayer], mapWorld, destrucTileList, obj, hostPlayer, shotsPlayer, sound, ref msg, explosionList);
+                    Player1Events.MouseEvents(mouseState, oldMouseState, players[hostPlayer], shotsPlayer, offsetX, offsetY, sound);
+                    shotsPlayer.Update();
+                    UpdateExplosion();
+                    Reset();
+
+                    for (int i = 0; i < Enemys.Count; i++)
+                    {
+                        Enemys[i].shotsIA.otherTirList = new List<Tirs>();
+                        Enemys[i].shotsIA.otherTirList = shotsPlayer.tirList;
+                        for (int j = 0; j < Enemys[i].shotsIA.tirList.Count; j++)
+                        {
+                            shotsPlayer.otherTirList.Add(Enemys[i].shotsIA.tirList[j]);
+                        }
+                    }
+
+                    for (int i = 0; i < Enemys.Count; i++)
+                    {
+                        IA.IACheckEvents(Enemys[i], IAtype.patr_Snd, mapWorld, obj, players, Enemys[i].shotsIA, destrucTileList, hostPlayer, sound, explosionList);
+                    }
+
+                    for (int i = 0; i < Enemys.Count; i++)
+                    {
+                        Enemys[i].shotsIA.Update();
+                    }
+
+                    mapWorld.Update();
+                    UpdateOffset(); //Camera
+                    break;
+
+                case GameState.multi:
+                    destrucTileList = new List<Vector3>();
+                    CreateDyna();
+                    Player1Events.CheckEvents(keyboardState, oldKeyboardState, players[hostPlayer], mapWorld, destrucTileList, obj, hostPlayer, shotsPlayer, sound, ref msg, explosionList);
+                    Player1Events.MouseEvents(mouseState, oldMouseState, players[hostPlayer], shotsPlayer, offsetX, offsetY, sound);
+                    shotsPlayer.Update();
+                    UpdateExplosion();
+                    Reset();
+                    UpdateOffset(); //Camera
+                    UpdateNetwork();
+                    break;
+
+                case GameState.menu:
+                    menu.Update(ref gameState, keyboardState, oldKeyboardState, mouseState, oldMouseState, mouseCoef, Content);
+
+                    if (gameState == GameState.exit)
+                    {
+                        Exit();
+                    }
+                    if (gameState == GameState.multi || gameState == GameState.solo || gameState == GameState.editor)
+                    {
+                        LoadContent();
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            //Save old Events State
+            oldMouseState = mouseState;
+            oldKeyboardState = keyboardState;
+
+            base.Update(gameTime);
+        }
+
+        private void Reset()
+        {
+            shotsPlayer.otherTirList = new List<Tirs>();
+        }
+
+        private void CreateDyna()
+        {
+            int playerIndex;
+            int platFormIndex;
+            int enemyIndex;
+            obj = new ObjetDyna[(players.Count + mapWorld.platFormList.Count + Enemys.Count + explosionList.Count)];
+            for (playerIndex = 0; playerIndex < players.Count; playerIndex++)
+            {
+                obj[playerIndex] = new ObjetDyna(players[playerIndex].pos, players[playerIndex].size, objectType.player, players[playerIndex].playerNum);
+            }
+            for (enemyIndex = 0; enemyIndex < Enemys.Count; enemyIndex++)
+            {
+                Enemys[enemyIndex].playerNum = 100 + enemyIndex;
+                obj[playerIndex + enemyIndex] = new ObjetDyna(Enemys[enemyIndex].pos, Enemys[enemyIndex].size, objectType.player, Enemys[enemyIndex].playerNum);
+            }
+            for (platFormIndex = 0; platFormIndex < mapWorld.platFormList.Count; platFormIndex++)
+            {
+                obj[playerIndex + enemyIndex + platFormIndex] = new ObjetDyna(mapWorld.platFormList[platFormIndex].position, mapWorld.platFormList[platFormIndex].size, mapWorld.platFormList[platFormIndex].type, 200 + platFormIndex);
+            }
+            for (int i = 0; i < explosionList.Count; i++)
+            {
+                obj[playerIndex + enemyIndex + platFormIndex + i] = new ObjetDyna(explosionList[i].position, explosionList[i].size, objectType.explosion, 0);
+            }
+        }
+
+        private void UpdateMouse()
+        {
+            cursorPos = new Vector2((float)(Mouse.GetState().X * mouseCoef) - 25, (float)(Mouse.GetState().Y * mouseCoef) - 27);
+        }
+
+        private void UpdateOffset()
+        {
+            offsetX = (int)(players[hostPlayer].pos.X - GraphicsDevice.Viewport.Width / 2.1);
+            offsetY = (int)(players[hostPlayer].pos.Y - GraphicsDevice.Viewport.Height / 3);
+        }
+
+        private void UpdateNetwork()
+        {
+            client.SendPacket(players, hostPlayer, destrucTileList, shotsPlayer);
+            client.GetPacket(players, hostPlayer, mapWorld, shotsPlayer, textures, Content, ref explosionList, ammoTab);
+        }
+
+        private void UpdateExplosion()
+        {
+            for (int i = 0; i < explosionList.Count; i++)
+            {
+                explosionList[i].iteration++;
+                if (explosionList[i].iteration > 5)
+                {
+                    explosionList.RemoveAt(i);
+                }
+            }
+        }
+    }
+}

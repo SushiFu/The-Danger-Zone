@@ -1,9 +1,4 @@
-# The Danger Zone
+Git Repository of The Danger Zone Game developed by SimplyUs team.
+Bullshit Team Ever.
 
-A 2D platform shooter game:
-- Windows, MacOs, Unix/Linux
-- Powered by Monogame
-
-# Dependencies
-- Mono Runtime
-- Monogame framework
+A TPS Shoot Game.
