@@ -2,6 +2,7 @@
 
 A 2D platform shooter game:
 - Windows, MacOs, Unix/Linux
+- C# / .NET
 - Powered by Monogame
 - Map Editor
 - Online, CLI Server
