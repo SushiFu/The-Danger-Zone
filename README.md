@@ -9,4 +9,4 @@ A 2D platform shooter game:
 
 # Dependencies
 - Mono Runtime
-- Monogame framework
+- Monogame framework (XNA fork)
