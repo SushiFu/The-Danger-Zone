@@ -1,5 +1,4 @@
 # The Danger Zone
-by SimplyUs - InfoSup EPITA 2018
 
 A 2D TPS platform game:
 - Windows, MacOs, Unix/Linux
@@ -9,6 +8,7 @@ A 2D TPS platform game:
 - Online, CLI Server with Lidgren library
 
 # Authors
+SimplyUs Team - InfoSup EPITA 2018
 - Marc-Antoine Faillon
 - Seiji Fouquet
 - Quentin Gras
