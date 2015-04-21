@@ -9,16 +9,16 @@ A 2D TPS platform game:
 - Online, CLI Server
 
 # Authors
-- Loïc Greiner
 - Marc-Antoine Faillon
 - Seiji Fouquet
 - Quentin Gras
+- Loïc Greiner
 
 # Dependencies
 - Mono Runtime
 - Monogame Framework (XNA fork)
 
-# Medias
+# Screenshots
 ![alt tag](https://raw.githubusercontent.com/SushiFu/The-Danger-Zone/master/screenshots/8.png)
 ![alt tag](https://raw.githubusercontent.com/SushiFu/The-Danger-Zone/master/screenshots/7.png)
 ![alt tag](https://raw.githubusercontent.com/SushiFu/The-Danger-Zone/master/screenshots/6.png)
