@@ -6,7 +6,7 @@ A 2D TPS platform game:
 - C# / .NET
 - Powered by Monogame
 - Map Editor
-- Online, CLI Server
+- Online, CLI Server with Lidgren library
 
 # Authors
 - Marc-Antoine Faillon
