@@ -5,7 +5,7 @@ A 2D TPS platform game:
 - C# / .NET
 - Powered by Monogame
 - Map Editor
-- Online, CLI Server with Lidgren library
+- Online with Lidgren library, CLI Server
 
 # Authors
 SimplyUs Team - InfoSup EPITA 2018
